@@ -87,6 +87,7 @@ def visual_count_data(csv_dir, counts):
     return lst_means
 
 def plot_scatter(x_data, y_data, x_label, y_label, title, concentration):
+    # output_directory = "../output_images/tests"
     output_directory = "../output_images/tests"
 
     x_2D = np.array(x_data).reshape(-1, 1)
