@@ -1,59 +1,45 @@
-# Set working directory
-setwd("/Users/yujirokisu/Documents/devs/Paramecium_with_cyanobacteria_processing_images/final_analysis_zourimushi/cyano_count_manual")
-
-# Load necessary libraries
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-
-# Read the data
-data <- read.csv("/Users/yujirokisu/Documents/devs/Paramecium_with_cyanobacteria_processing_images/final_analysis_zourimushi/cyano_count_manual/cyano_cout_manual.csv")
-
-# Reshape the data to long format for easier plotting
-data_long <- data %>%
-  pivot_longer(cols = c(before, after_dark, after_light),
-               names_to = "time",
-               values_to = "value") %>%
-  mutate(time = factor(time, levels = c("before", "after_dark", "after_light")))
-
-# Calculate overall y-axis range and round limits to nearest multiple of 10
-y_min <- floor(min(data_long$value, na.rm = TRUE) / 10) * 10
-y_max <- ceiling(max(data_long$value, na.rm = TRUE) / 10) * 10
-
-# Define axis interval as 20
-y_interval <- 20
-
-# Create plots for each stock
-stocks <- unique(data$stock)
-
 # Loop through each stock and create the plots
 for (stock_name in stocks) {
   # Filter data for the current stock
   stock_data <- data_long %>% filter(stock == stock_name)
   
-  # Calculate mean values for each time point
-  mean_data <- stock_data %>%
+  ## Calculate regression equation for "dark" condition
+  overall_mean_dark <- stock_data %>%
+    filter(time %in% c("before", "after_dark")) %>%
     group_by(time) %>%
-    summarise(mean_value = mean(value, na.rm = TRUE))
+    summarise(overall_mean = mean(value, na.rm = TRUE)) %>%
+    mutate(time_numeric = as.numeric(time))
   
-  # Calculate overall average across all concentrations for the stock
-  overall_mean_data <- stock_data %>%
+  regression_dark <- lm(overall_mean ~ time_numeric, data = overall_mean_dark)
+  coef_dark <- coefficients(regression_dark)
+  slope_dark <- round(coef_dark["time_numeric"], 2)
+  intercept_dark <- round(coef_dark["(Intercept)"], 2)
+  equation_dark <- paste0("y = ", slope_dark, "x + ", intercept_dark)
+  
+  ## Calculate regression equation for "light" condition
+  overall_mean_light <- stock_data %>%
+    filter(time %in% c("before", "after_light")) %>%
     group_by(time) %>%
-    summarise(overall_mean = mean(value, na.rm = TRUE))
+    summarise(overall_mean = mean(value, na.rm = TRUE)) %>%
+    mutate(time_numeric = as.numeric(time))
+  
+  regression_light <- lm(overall_mean ~ time_numeric, data = overall_mean_light)
+  coef_light <- coefficients(regression_light)
+  slope_light <- round(coef_light["time_numeric"], 2)
+  intercept_light <- round(coef_light["(Intercept)"], 2)
+  equation_light <- paste0("y = ", slope_light, "x + ", intercept_light)
   
   # Before vs After Dark Plot
   plot_dark <- ggplot(stock_data %>% filter(time %in% c("before", "after_dark")),
                       aes(x = time, y = value, group = factor(concentration), color = factor(concentration))) +
     geom_line(size = 1) +
     geom_point(size = 3) +
-    # Add average line for individual concentrations
-    geom_line(data = mean_data %>% filter(time %in% c("before", "after_dark")),
-              aes(x = time, y = mean_value, group = 1), 
-              color = "black", linetype = "dashed", size = 1) +
     # Add overall average line
-    geom_line(data = overall_mean_data %>% filter(time %in% c("before", "after_dark")),
+    geom_line(data = overall_mean_dark,
               aes(x = time, y = overall_mean, group = 1),
               color = "blue", linetype = "dashed", size = 1) +
+    # Annotate with the regression equation
+    annotate("text", x = 1.5, y = y_max - 10, label = equation_dark, color = "black", size = 6, hjust = 0) +
     labs(title = paste("Before vs After Dark for Stock:", stock_name),
          x = "Time",
          y = "The number of cyanobacteria (/400 µm^2)",
@@ -74,14 +60,12 @@ for (stock_name in stocks) {
                        aes(x = time, y = value, group = factor(concentration), color = factor(concentration))) +
     geom_line(size = 1) +
     geom_point(size = 3) +
-    # Add average line for individual concentrations
-    geom_line(data = mean_data %>% filter(time %in% c("before", "after_light")),
-              aes(x = time, y = mean_value, group = 1), 
-              color = "black", linetype = "dashed", size = 1) +
     # Add overall average line
-    geom_line(data = overall_mean_data %>% filter(time %in% c("before", "after_light")),
+    geom_line(data = overall_mean_light,
               aes(x = time, y = overall_mean, group = 1),
               color = "blue", linetype = "dashed", size = 1) +
+    # Annotate with the regression equation
+    annotate("text", x = 1.5, y = y_max - 10, label = equation_light, color = "black", size = 6, hjust = 0) +
     labs(title = paste("Before vs After Light for Stock:", stock_name),
          x = "Time",
          y = "The number of cyanobacteria (/400 µm^2)",

@@ -65,8 +65,8 @@
 <circle cx='367.49' cy='440.36' r='3.56' style='stroke-width: 0.71; stroke: #00B0F6; fill: #00B0F6;' />
 <circle cx='179.79' cy='71.07' r='3.56' style='stroke-width: 0.71; stroke: #E76BF3; fill: #E76BF3;' />
 <circle cx='367.49' cy='500.99' r='3.56' style='stroke-width: 0.71; stroke: #E76BF3; fill: #E76BF3;' />
-<polyline points='179.79,130.60 367.49,478.34 ' style='stroke-width: 2.13; stroke-dasharray: 11.38,11.38; stroke-linecap: butt;' />
 <polyline points='179.79,130.60 367.49,478.34 ' style='stroke-width: 2.13; stroke: #0000FF; stroke-dasharray: 11.38,11.38; stroke-linecap: butt;' />
+<text x='273.64' y='81.92' style='font-size: 17.07px; font-family: "Arial";' textLength='166.00px' lengthAdjust='spacingAndGlyphs'>y = -147.21x + 304.01</text>
 </g>
 <g clip-path='url(#cpMC4wMHw1NzYuMDB8MC4wMHw1NzYuMDA=)'>
 <text x='62.24' y='508.16' text-anchor='end' style='font-size: 20.00px;fill: #4D4D4D; font-family: "Arial";' textLength='11.12px' lengthAdjust='spacingAndGlyphs'>0</text>
