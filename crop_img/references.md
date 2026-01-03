@@ -1,0 +1,1 @@
+[Cropping an image with OpenCV](https://github.com/taniiicom/study-application-programming-exp/blob/main/human-informatics/src/MarkerTracking_2.py)
